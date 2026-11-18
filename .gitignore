@@ -1,0 +1,22 @@
+# Node / Vite
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+
+# Env: секреты и личный dev-токен не коммитим, пример — коммитим
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Agents: личные настройки и черновики не коммитим
+CLAUDE.local.md
+AGENTS.local.md
+.claude/settings.local.json
+scratch/

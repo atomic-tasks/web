@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Зависимости группируются в один PR в неделю на экосистему, чтобы не было шума
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      npm:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
