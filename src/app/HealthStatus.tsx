@@ -1,6 +1,6 @@
 import { useHealth } from "../api/generated/endpoints";
 
-/** Временный индикатор связи с бэкендом для каркаса: проверяет всю цепочку прокси → API → клиент. */
+/** Индикатор связи с бэкендом в шапке: проверяет всю цепочку прокси → API → клиент. */
 export function HealthStatus() {
   const { data, isPending, isError } = useHealth({ query: { retry: false } });
 

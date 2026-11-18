@@ -6,7 +6,8 @@
 ## Стек
 
 React 19, Vite 8, TypeScript 6 (strict), pnpm, ESLint + Prettier, Vitest, Node 26 LTS. Данные —
-TanStack Query, клиент к API генерирует Orval из `openapi/openapi.json`. Почему так — ADR 0001.
+TanStack Query, клиент к API генерирует Orval из `openapi/openapi.json`. Роутер — TanStack Router,
+UI — React Aria Components со своим CSS. Почему так — ADR 0001 и 0004.
 
 ## Как это работает
 
@@ -26,15 +27,25 @@ TanStack Query, клиент к API генерирует Orval из `openapi/ope
 ## Вход
 
 Целевое (ADR 0003): бэкенд сам проходит вход в Rauthy и ставит httpOnly-cookie сессии; сайт видит только
-cookie и узнаёт пользователя через `GET /api/v1/me`. Требует спеки в бэкенде — её пока нет.
+cookie и узнаёт пользователя через `GET /api/v1/me`. Бэкенд: ADR 0013 и спека 0008
+(`../backend/docs/specs/0008-browser-sessions/`).
 
 До этого — локальная разработка с personal access token: `ATOMIC_DEV_TOKEN` в `.env.local`, dev-прокси
 подставляет `Authorization: Bearer` к запросам `/api`. Браузер токен не видит, в бандл он не попадает.
 
 ## Модули
 
-Раскладка `src/` и правила импортов — ADR 0002. Сейчас есть `app/` (оболочка) и `api/` (клиент).
-`auth/`, `features/<name>/`, `shared/ui/`, `shared/lib/` появятся со спеками из `docs/roadmap.md`.
+Раскладка `src/` и правила импортов — ADR 0002. Сейчас есть `app/` (оболочка и роутер), `api/` (клиент),
+`auth/` (сессия по `GET /api/v1/me`) и `shared/ui/` (токены и базовые компоненты). `features/<name>/`
+и `shared/lib/` появятся со спеками из `docs/roadmap.md`.
+
+## Оболочка
+
+- Роутер — TanStack Router, маршруты в коде (`src/app/router.tsx`), адреса и параметры типизированы.
+- UI — React Aria Components (поведение, доступность) + свой CSS на токенах `src/shared/ui/theme.css`.
+- Ошибки API: текст для пользователя — `describeApiError` (`src/api/errors.ts`); повторы — только сеть
+  и `5xx`; `401` на любом запросе перезапрашивает `me`, и оболочка показывает «Вы не вошли».
+- Почему так — ADR 0004 и спека `docs/specs/0001-shell/`.
 
 ## Связь с бэкендом
 

@@ -16,7 +16,11 @@ export class ApiError<TBody = unknown> extends Error {
   }
 }
 
-/** Тип ошибки в хуках Orval: `useGetMe()` → `error: ApiError<...> | null`. */
+/**
+ * Тип ошибки в хуках Orval: `useGetMe()` → `error: ApiError<...> | null`.
+ * На деле `error` бывает и другим: обрыв сети (`TypeError` от `fetch`), битый JSON (`SyntaxError`),
+ * отмена (`AbortError`). Сужать только через `instanceof ApiError` (`errors.ts`).
+ */
 export type ErrorType<TBody> = ApiError<TBody>;
 
 const readBody = async (response: Response): Promise<unknown> => {

@@ -13,7 +13,12 @@
 - Функции (`generated/endpoints.ts`) — те же запросы без React: `getMe()`, `createTask(body)`, …
   Возвращают тело успешного ответа.
 - Модели (`generated/model/`) — типы запросов и ответов: `MeResponse`, `TaskResponse`, `TaskStatus`, …
-- `ApiError` (`fetcher.ts`) — ошибка ответа не 2xx: `status` и `body`. Это `error` в хуках.
+- `ApiError` (`fetcher.ts`) — ошибка ответа не 2xx: `status` и `body`. Тип `error` в хуках, но фактически
+  там бывает и обрыв сети (`TypeError`), битый JSON (`SyntaxError`), отмена (`AbortError`): сужать
+  только через `instanceof ApiError`.
+- `describeApiError`, `isRetryableError`, `isUnauthorized` (`errors.ts`) — текст ошибки запроса для
+  пользователя (обрыв сети и `502/503/504` — «нет связи»; `detail` problem details — только для
+  `400/409/422`), повторять ли запрос (обрыв сети и `5xx`), это ли `401`.
 - `apiFetch` (`fetcher.ts`) — мутатор Orval. Напрямую из кода приложения не вызывается.
 
 ## Invariants
@@ -25,6 +30,8 @@
 - `apiFetch` всегда ставит `credentials: "include"` — браузер отправляет cookie сессии бэкенда.
 - Ответ не 2xx всегда превращается в `ApiError`; успешный — в тело ответа (для `204` — `undefined`).
 - Токены и заголовок `Authorization` в браузерном коде не формируются.
+- Текст ошибки ответа API для пользователя — только из `describeApiError`; тело ответа целиком
+  не показывается, и наш код его не логирует.
 
 ## Side Effects
 

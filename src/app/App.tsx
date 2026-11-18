@@ -1,16 +1,16 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "@tanstack/react-router";
 
-import { HealthStatus } from "./HealthStatus";
+import "../shared/ui/theme.css";
+import { createQueryClient } from "./queryClient";
+import { router } from "./router";
 
-const queryClient = new QueryClient();
+const queryClient = createQueryClient();
 
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <main>
-        <h1>AtomicTasks</h1>
-        <HealthStatus />
-      </main>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   );
 }
