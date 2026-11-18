@@ -32,7 +32,7 @@ Node закреплён в `.node-version`, pnpm — в `package.json` (`package
 
 Раскладка `src/` (ADR 0002): `app/` — вход и оболочка, `api/` — клиент к бэкенду, `auth/` — сессия,
 `features/<name>/` — экраны и логика одной области, `shared/ui/` и `shared/lib/` — общее.
-Импорты направлены вниз: `app → features → shared/api`; фичи не импортируют друг друга.
+Импорты направлены вниз: `app → features → auth → api, shared/*`; фичи не импортируют друг друга.
 
 ## Контракты модулей (README по EGM, ADR 0002)
 
