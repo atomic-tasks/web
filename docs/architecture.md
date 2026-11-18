@@ -26,7 +26,8 @@ TanStack Query, клиент к API генерирует Orval из `openapi/ope
 ## Вход
 
 Целевое (ADR 0003): бэкенд сам проходит вход в Rauthy и ставит httpOnly-cookie сессии; сайт видит только
-cookie и узнаёт пользователя через `GET /api/v1/me`. Требует спеки в бэкенде — её пока нет.
+cookie и узнаёт пользователя через `GET /api/v1/me`. Бэкенд: ADR 0013 и спека 0008
+(`../backend/docs/specs/0008-browser-sessions/`).
 
 До этого — локальная разработка с personal access token: `ATOMIC_DEV_TOKEN` в `.env.local`, dev-прокси
 подставляет `Authorization: Bearer` к запросам `/api`. Браузер токен не видит, в бандл он не попадает.
