@@ -1,0 +1,39 @@
+# Прод-стек сайта (спека 0002, ADR 0005). Запускается через deploy.sh: он задаёт VERSION.
+# Всё о конкретном сервере — в .env рядом с этим файлом (шаблон — .env.example).
+# Маршрут /api/ на WEB_HOST — роутер бэкенда (его compose, спека 0008 бэкенда): правило длиннее и выигрывает.
+name: atomic-tasks-web
+
+services:
+  web:
+    image: ${IMAGE:-ghcr.io/atomic-tasks/web}:${VERSION:?запускайте через deploy.sh или задайте VERSION}
+    restart: unless-stopped
+    # Только чтение, без capabilities: nginx-unprivileged работает от uid 101 на порту 8080,
+    # временные файлы и pid — в /tmp. Те же флаги — в CI (джоба image).
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 64m
+    # 127.0.0.1, а не localhost: nginx слушает только IPv4 (скрипт IPv6 на read_only пропускается)
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/version.txt"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+      start_interval: 1s
+    networks: [traefik]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:?}
+      traefik.http.routers.atomic-web.rule: Host(`${WEB_HOST:?}`)
+      traefik.http.routers.atomic-web.entrypoints: ${TRAEFIK_ENTRYPOINT:?}
+      traefik.http.routers.atomic-web.tls.certresolver: ${TRAEFIK_CERTRESOLVER:?}
+      traefik.http.services.atomic-web.loadbalancer.server.port: "8080"
+
+networks:
+  traefik:
+    name: ${TRAEFIK_NETWORK}
+    external: true

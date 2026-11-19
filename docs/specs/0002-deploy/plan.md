@@ -21,8 +21,9 @@ https://WEB_HOST/<любое>     → Traefik → nginx: index.html, no-cache �
   - **после** `pnpm build` в той же стадии — `ARG VERSION=0.0.0-dev` и запись `$VERSION` в
     `dist/version.txt`; пустая версия — ошибка сборки. ARG после сборки: смена версии не сбрасывает кэш
     установки и сборки; ARG до `FROM` или только в `runtime` дал бы пустой файл;
-  - стадия `runtime` (`nginxinc/nginx-unprivileged:<версия>-alpine`, тег закреплён): конфиги из
-    `deploy/nginx/` в `/etc/nginx/conf.d/`, `dist/` в `/usr/share/nginx/html`.
+  - стадия `runtime` (`nginxinc/nginx-unprivileged:1.30-alpine`): страницы-примеры базового образа удаляются,
+    `default.conf` — в `/etc/nginx/conf.d/`, `security-headers.conf` — в `/etc/nginx/snippets/` (не в `conf.d`:
+    всё оттуда nginx подключает на уровне `http`), `dist/` — в `/usr/share/nginx/html`.
 - `.dockerignore` — `.git`, `node_modules`, `dist`, `.env*` (кроме `.env.example`), `scratch`, `*.local.md`,
   `.claude`, `.codegraph`.
 - `deploy/nginx/default.conf`:
@@ -36,7 +37,8 @@ https://WEB_HOST/<любое>     → Traefik → nginx: index.html, no-cache �
 - `deploy/compose.yaml` — проект `atomic-tasks-web`, сервис `web`: образ
   `${IMAGE:-ghcr.io/atomic-tasks/web}:${VERSION:?}`, сеть Traefik (external), labels: `Host(${WEB_HOST})`,
   entrypoint, certresolver, порт `8080`; `read_only`, `tmpfs: /tmp`, `cap_drop: [ALL]`,
-  `security_opt: [no-new-privileges:true]`, `mem_limit: 64m`, `restart: unless-stopped`.
+  `security_opt: [no-new-privileges:true]`, `mem_limit: 64m`, `restart: unless-stopped`; healthcheck
+  `wget http://127.0.0.1:8080/version.txt` (IPv4: на `read_only` nginx не слушает IPv6).
 - `deploy/.env.example` — `WEB_HOST`, `TRAEFIK_NETWORK`, `TRAEFIK_ENTRYPOINT`, `TRAEFIK_CERTRESOLVER`.
 - `deploy/deploy.sh` — по образцу `../backend/deploy/deploy.sh`: проверка версии `X.Y.Z`, `flock`, скачивание
   `deploy.tar.gz` из релиза `atomic-tasks/web`, `compose.yaml` и `deploy.sh.new`, `docker compose pull`,
@@ -68,6 +70,9 @@ https://WEB_HOST/<любое>     → Traefik → nginx: index.html, no-cache �
   - `workflow_dispatch` с версией — только выкатка.
 - `src/app/HealthStatus.tsx`, `vite.config.ts`, `.env.example` — после `GET /api/v1/health` в контракте:
   индикатор через новый хук, прокси `/health` и упоминания `/health` убираются.
+
+- `deploy/csp.test.ts` — хэши inline-стилей React Aria в `style-src` совпадают с текстами из установленного
+  пакета (ADR 0005); `deploy/**/*.ts` — в `tsconfig.node.json`.
 
 ## Модули и контракты
 

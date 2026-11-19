@@ -1,0 +1,18 @@
+# Контекст сборки образа: только то, что нужно для pnpm build.
+# .env.local содержит личный ATOMIC_DEV_TOKEN — в контекст не попадает.
+.git
+.github
+node_modules
+dist
+coverage
+scratch
+.env*
+!.env.example
+*.local.md
+.claude
+.codegraph
+.idea
+.vscode
+.DS_Store
+Dockerfile
+.dockerignore

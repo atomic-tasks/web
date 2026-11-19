@@ -52,7 +52,7 @@
 - Остальные пути: файл, если есть (`/version.txt` и т. п.), иначе `index.html` со статусом `200`.
   `index.html` и прочие файлы вне `/assets/` — `Cache-Control: no-cache`.
 - Заголовки на каждом ответе, включая `404` и `503`:
-  - `Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:;
+  - `Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self' <два хэша>; img-src 'self' data:;
 font-src 'self'; connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'self';
 frame-ancestors 'none'`;
   - `X-Content-Type-Options: nosniff`;
@@ -61,8 +61,8 @@ frame-ancestors 'none'`;
   - `Cross-Origin-Opener-Policy: same-origin`;
   - `Strict-Transport-Security: max-age=31536000` (без `includeSubDomains`: на домене живут чужие хосты).
 - Версия nginx в ответах не показывается (`server_tokens off`).
-- Если React Aria под `style-src 'self'` что-то ломает — ослабление CSP только с обоснованием в ADR 0005,
-  а не молча.
+- React Aria вставляет два `<style>` (`usePress`, `usePreventScroll`): они разрешены в `style-src` по хэшу
+  (ADR 0005), тест сверяет хэши с установленным пакетом. Любое другое ослабление CSP — только через ADR.
 
 **Стек на сервере**
 
@@ -111,4 +111,5 @@ frame-ancestors 'none'`;
   Блокирует только задачу перевода индикатора, не деплой.
 - **HSTS у Traefik.** Если Traefik уже ставит HSTS всем хостам, заголовок в nginx дублирует его. Проверить
   на сервере при первой выкатке; два одинаковых заголовка безвредны, но лишни.
-- Размер образа и память контейнера — записать после первой выкатки.
+- Размер образа и память контейнера. Локально: образ ~91 МБ (из них ~0,4 МБ — `dist/`, остальное — nginx на
+  alpine), память под `smoke.sh` — ~9 МиБ из 64. На сервере — записать после первой выкатки.

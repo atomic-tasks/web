@@ -1,0 +1,164 @@
+# Релиз по тегу vX.Y.Z (спека 0002): образ в ghcr и GitHub Release с deploy.tar.gz этой версии.
+# Затем выкатка на сервер с подтверждением в environment production (по образцу ADR 0011 бэкенда).
+# Ручной запуск — только выкатка уже опубликованной версии (откат или повтор).
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Версия для выкатки, X.Y.Z (релиз уже опубликован)"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # GitHub Release
+      packages: write # ghcr.io
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check tag
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if ! [[ "$TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Тег $TAG не вида vX.Y.Z"
+            exit 1
+          fi
+          # Релизим только то, что прошло ревью и CI: коммит тега должен быть в main.
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Коммит тега $TAG не входит в main"
+            exit 1
+          fi
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+          flavor: latest=true
+
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          build-args: VERSION=${{ steps.version.outputs.version }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Опубликованный образ отдаёт именно эту версию
+      - name: Check image version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          test "$(docker run --rm --entrypoint cat "$IMAGE:$VERSION" /usr/share/nginx/html/version.txt)" = "$VERSION"
+
+      # Конфиг стека этой версии: deploy.sh на сервере скачивает его из релиза.
+      - name: Deploy bundle
+        run: tar -czf deploy.tar.gz --owner=0 --group=0 -C deploy compose.yaml deploy.sh
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" deploy.tar.gz --verify-tag --generate-notes --title "$TAG"
+
+  deploy:
+    needs: release
+    # После релиза по тегу или ручным запуском (тогда release пропущен)
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    # Подтверждение автора и секреты SSH — только в этом environment (docs/deploy.md)
+    environment:
+      name: production
+      url: https://${{ vars.WEB_HOST }}
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    permissions:
+      contents: read # checkout ради deploy/smoke.sh
+    steps:
+      - name: Version
+        id: version
+        env:
+          EVENT: ${{ github.event_name }}
+          TAG: ${{ github.ref_name }}
+          INPUT: ${{ inputs.version }}
+        run: |
+          if [ "$EVENT" = push ]; then version="${TAG#v}"; else version="$INPUT"; fi
+          if ! [[ "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Версия '$version' не вида X.Y.Z"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Без сторонних actions: ключ ограничен на сервере forced command, передаём только версию.
+      - name: Deploy
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+          PORT: ${{ vars.DEPLOY_PORT || '22' }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          for v in SSH_KEY KNOWN_HOSTS HOST DEPLOY_USER; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Не задан $v в environment production (docs/deploy.md)"
+              exit 1
+            fi
+          done
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -p "$PORT" \
+            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            "$DEPLOY_USER@$HOST" "$VERSION"
+          rm -f ~/.ssh/deploy_key
+
+      # Снаружи, через Traefik и HTTPS: новая версия, fallback, кэш и заголовки на месте.
+      # Ключ уже удалён: checkout после него не видит секретов SSH.
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check public site
+        env:
+          WEB_HOST: ${{ vars.WEB_HOST }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if [ -z "$WEB_HOST" ]; then
+            echo "::error::Не задан WEB_HOST в environment production (docs/deploy.md)"
+            exit 1
+          fi
+          deploy/smoke.sh "https://$WEB_HOST" --version "$VERSION" --behind-backend
