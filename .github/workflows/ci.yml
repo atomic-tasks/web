@@ -40,6 +40,34 @@ jobs:
           fi
       - run: pnpm build
 
+  # Образ сайта с ограничениями прода (deploy/compose.yaml) и проверка ответов nginx (спека 0002)
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          tags: atomic-tasks-web:ci
+          build-args: VERSION=0.0.0-ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Run with production restrictions
+        run: |
+          docker run -d --name web --read-only --tmpfs /tmp --cap-drop ALL \
+            --security-opt no-new-privileges --memory 64m -p 8080:8080 atomic-tasks-web:ci
+      - run: deploy/smoke.sh http://localhost:8080 --version 0.0.0-ci
+      - name: No write or startup errors in logs
+        if: always()
+        run: |
+          docker logs web 2>&1
+          if docker logs web 2>&1 | grep -E '\[(emerg|alert|crit|error)\]|Permission denied'; then
+            echo "::error::nginx пишет ошибки — см. лог выше"
+            exit 1
+          fi
+
   secrets:
     runs-on: ubuntu-latest
     steps:

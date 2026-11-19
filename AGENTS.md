@@ -21,13 +21,18 @@ Node закреплён в `.node-version`, pnpm — в `package.json` (`package
 - `pnpm gen:api` — Orval: модели, функции и хуки TanStack Query из `openapi/openapi.json` в `src/api/generated/`
 - `uvx pre-commit install` — один раз после клонирования: gitleaks, Prettier и ESLint перед коммитом
 
-Перед тем как считать работу законченной: `pnpm check` и `pnpm build` проходят.
+- `docker build -t atomic-tasks-web .` и `deploy/smoke.sh http://localhost:8080` — образ сайта и проверка ответов
+  nginx (запуск с ограничениями прода — `docs/deploy.md`, п. 2)
+
+Перед тем как считать работу законченной: `pnpm check` и `pnpm build` проходят. Изменил `Dockerfile` или
+`deploy/` — ещё образ и `deploy/smoke.sh`.
 
 ## Структура
 
 - `src/` — код. Карта модулей — `src/README.md`.
 - `openapi/openapi.json` — закреплённая версия контракта бэкенда, из неё генерируется клиент (`orval.config.ts`).
 - `docs/` — intent, architecture, roadmap, ADR, спеки.
+- `deploy/` — прод: конфиг nginx (fallback, кэш, CSP), compose за Traefik, `deploy.sh`, `smoke.sh`. Runbook — `docs/deploy.md`.
 - `scratch/` — черновики и артефакты EGM, не коммитится.
 
 Раскладка `src/` (ADR 0002): `app/` — вход и оболочка, `api/` — клиент к бэкенду, `auth/` — сессия,

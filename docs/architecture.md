@@ -12,14 +12,16 @@ UI — React Aria Components со своим CSS. Почему так — ADR 00
 ## Как это работает
 
 ```
-Браузер ──► https://<APP_HOST>/            статика из dist/ (index.html + JS + CSS)
-        ──► https://<APP_HOST>/api/v1/*    ┐
-        ──► https://<APP_HOST>/health      ┴─► Traefik ─► backend (FastAPI)
+Браузер ──► https://<WEB_HOST>/api/*  ──► Traefik ─► backend (FastAPI)
+        ──► https://<WEB_HOST>/*      ──► Traefik ─► web (nginx: dist/, index.html на любой путь)
 ```
 
-- Сборка (`pnpm build`) превращает TypeScript и React в обычные JS/CSS-файлы в `dist/`. На сервере их
-  раздаёт любой статический сервер за Traefik — своего Node-процесса в проде нет.
-- Сайт и API на одном хосте: Traefik отдаёт `/api` и `/health` бэкенду, остальное — статике (ADR 0003).
+- Сборка (`pnpm build`) превращает TypeScript и React в обычные JS/CSS-файлы в `dist/`. В проде их отдаёт
+  nginx из образа `ghcr.io/atomic-tasks/web` — своего Node-процесса нет (ADR 0005).
+- Сайт и API на одном хосте: Traefik отдаёт `/api/` бэкенду, остальное — сайту (ADR 0003, спека 0008 бэкенда).
+  `/health` бэкенда на хосте сайта нет: индикатор перейдёт на `GET /api/v1/health`, когда он появится в контракте.
+- nginx отвечает за то, чего Traefik не умеет: `index.html` на любой путь, кэш (`assets/` — на год,
+  `index.html` — без кэша), заголовки безопасности (CSP и др.), `503` на `/api/`, если бэкенда нет.
   Поэтому не нужен CORS, а cookie сессии — «своя» для страницы (`SameSite=Lax`).
 - В разработке ту же роль играет прокси dev-сервера Vite (`vite.config.ts`): `pnpm dev` на :5173,
   запросы `/api` и `/health` уходят в бэкенд на `ATOMIC_API_URL` (по умолчанию `http://localhost:8000`).
@@ -55,5 +57,7 @@ cookie и узнаёт пользователя через `GET /api/v1/me`. Б�
 ## Сборка и релизы
 
 - Версия — git-тег `vX.Y.Z` (`../guides/releases.md`), в `package.json` заглушка `0.0.0`.
-- Деплой — образ со статикой в ghcr за Traefik, как бэкенд, и заголовки безопасности (CSP, `Referrer-Policy`,
-  `Permissions-Policy`) на уровне Traefik. Отдельная спека перед первым деплоем.
+- Релиз — `release.yml` по тегу: образ в ghcr и GitHub Release с `deploy.tar.gz`; выкатка — джоба `deploy`
+  с подтверждением, ssh с forced command, как у бэкенда. Runbook — `docs/deploy.md`, спека 0002, ADR 0005.
+- Заголовки безопасности — в конфиге nginx (`deploy/nginx/`), проверяются `deploy/smoke.sh` в CI и после
+  выкатки, хэши CSP для стилей React Aria — тестом `deploy/csp.test.ts`.
