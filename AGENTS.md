@@ -14,7 +14,7 @@ EGM artifact directory: scratch/egm
 Node закреплён в `.node-version`, pnpm — в `package.json` (`packageManager`: глобальный pnpm сам переключается на эту версию).
 
 - `pnpm install` — зависимости (в CI — `pnpm install --frozen-lockfile`)
-- `pnpm dev` — dev-сервер с hot reload на http://localhost:5173, `/api` и `/health` проксируются в бэкенд
+- `pnpm dev` — dev-сервер с hot reload на http://localhost:5173, `/api` проксируется в бэкенд
 - `pnpm check` — всё сразу: `format:check`, `lint`, `typecheck`, `test`
 - `pnpm format` — Prettier, `pnpm lint` — ESLint, `pnpm typecheck` — `tsc -b`, `pnpm test` — Vitest
 - `pnpm build` — статика в `dist/`

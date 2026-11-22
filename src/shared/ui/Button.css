@@ -34,3 +34,21 @@
   opacity: 0.5;
   cursor: default;
 }
+
+/* `AnchorButton` — обычный `<a>`: состояния через псевдоклассы, а не data-атрибуты React Aria. */
+a.Button {
+  text-decoration: none;
+}
+
+a.Button:hover {
+  filter: brightness(0.95);
+}
+
+a.Button:active {
+  filter: brightness(0.9);
+}
+
+a.Button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

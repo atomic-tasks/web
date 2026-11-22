@@ -10,6 +10,8 @@
 - `theme.css` — токены в CSS-переменных (`--color-*`, `--space-*`, `--radius`, `--font-*`), светлая и тёмная
   схема по `prefers-color-scheme`, базовые стили `body`. Подключается один раз в `app/App.tsx`.
 - `Button` (`Button.tsx`) — кнопка React Aria (`onPress`), `variant`: `primary` | `secondary`.
+- `AnchorButton` (`AnchorButton.tsx`) — обычный `<a href>` с видом `Button`, для полной навигации за пределы SPA
+  (роутер не перехватывает); `variant` как у `Button`.
 - `Link` (`Link.tsx`) — ссылка внутри сайта: `to`/`params` проверяет TanStack Router, отрисовка — React Aria.
 - `ErrorMessage` (`ErrorMessage.tsx`) — `message`, необязательные `onRetry` и `retryLabel`; `role="alert"`.
 - `Loading` (`Loading.tsx`) — индикатор загрузки, `role="status"`.

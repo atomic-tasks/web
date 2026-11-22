@@ -13,6 +13,9 @@ export default defineConfig({
       override: {
         mutator: { path: "./src/api/fetcher.ts", name: "apiFetch" },
         fetch: { includeHttpResponseReturnType: false },
+        // `callback` бэкенда вызывает только браузер (редирект из IdP). Имя по умолчанию дало бы хук
+        // `useCallback`, который конфликтует с импортом из React в сгенерированном файле.
+        operations: { callback: { operationName: () => "authCallback" } },
       },
     },
   },
