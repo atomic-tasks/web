@@ -1,0 +1,86 @@
+@layer components {
+  .ListGroup {
+    margin: 0;
+    padding: 0;
+    overflow: clip;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .ListRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-block-size: calc(var(--target-size) + var(--space-4));
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-text);
+    text-decoration: none;
+    cursor: default;
+  }
+
+  .ListRow + .ListRow {
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+
+  .ListRow[href] {
+    cursor: pointer;
+  }
+
+  .ListRow[data-hovered] {
+    background: var(--color-surface-sunken);
+  }
+
+  .ListRow[data-focus-visible] {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: calc(-1 * var(--focus-ring-width));
+  }
+
+  .ListRow[data-dimmed] {
+    opacity: var(--opacity-dimmed);
+  }
+
+  /* Значок-признак в конце строки (шеврон «внутрь»). */
+  .ListRow-chevron svg {
+    flex: none;
+    inline-size: var(--space-4);
+    block-size: var(--space-4);
+  }
+
+  .ListRow-chevron {
+    display: flex;
+    flex: none;
+    color: var(--color-text-muted);
+  }
+
+  .ListRow-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-inline-size: 0;
+  }
+
+  .ListRow-title {
+    overflow-wrap: anywhere;
+  }
+
+  .ListRow-subtitle {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+  }
+
+  /* Описание: фоновая строка, обрезается многоточием. */
+  .ListRow-description {
+    overflow: hidden;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ListRow-title[data-struck] {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+  }
+}

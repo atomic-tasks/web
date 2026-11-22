@@ -1,0 +1,35 @@
+@layer components {
+  .ActionMenu-popover {
+    min-inline-size: calc(var(--space-8) * 5);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-floating);
+  }
+
+  .ActionMenu {
+    margin: 0;
+    padding: var(--space-1);
+    outline: none;
+  }
+
+  .ActionMenu-item {
+    display: flex;
+    align-items: center;
+    min-block-size: var(--target-size);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .ActionMenu-item[data-focused] {
+    background: var(--color-accent-soft);
+  }
+
+  /* Выбранный пункт отмечен не только цветом: жирный текст. */
+  .ActionMenu-item[data-selected] {
+    font-weight: var(--font-weight-bold);
+  }
+}

@@ -18,10 +18,16 @@
   `variant` как у `Button`.
 - `Link` (`Link.tsx`) — ссылка внутри сайта: `to`/`params` проверяет TanStack Router, отрисовка — React Aria;
   `variant`: `inline` (по умолчанию) | `bare` (без вида ссылки, для навигации).
-- `TabBar` (`TabBar.tsx`) — плавающая стеклянная нижняя навигация: `aria-label`, `items: { to, label, icon }[]`;
+- `TabBar` (`TabBar.tsx`) — плавающая стеклянная нижняя навигация: `aria-label`, `items: { to, label, icon, activeIcon? }[]`;
   текущему пункту роутер ставит `aria-current="page"`. Использует `Glass.css`.
 - `Glass.css` — класс `.Glass`: стекло и единый сплошной запасной вид.
-- `icons/CurrentIcon`, `icons/FolderIcon` — временные значки (inline-SVG, `currentColor`, `aria-hidden`).
+- `ScreenHeader` — верхняя панель: `title`, слот `back` (ссылка на родителя), слот `actions`.
+- `ListGroup` / `ListRow` — «сгруппированный список» на React Aria `GridList`/`GridListItem`; классы `ListRow-body|title|subtitle`.
+- `StatusMark` (`kind`: пять статусов задачи) — значок статуса: форма + цвет, декоративный. `Badge` — пилюля со значением.
+- `IconButton` — кнопка только со значком, `aria-label` обязателен. `ActionMenu` — `IconButton` + меню пунктов `{ id, label }`.
+- `Modal` (`title`, `onClose`) — модальное окно React Aria; `TextField`, `SliderField` (нативный range), `SelectField` (`Field.tsx`) — поля формы с подписью.
+- `Switch` (`isSelected`, `onChange`) и `SegmentedControl` (`items`, `selectedId`, `onChange`) — переключатели на React Aria.
+- `icons/*` — значки Lucide (ISC, https://lucide.dev), контуры скопированы в файлы, общая обёртка `Icon` (24×24, `currentColor`, `aria-hidden`): `List`, `ListChecks`, `Folder`, `FolderOpen`, `Pen`, `ChevronRight`, `Back` (chevron-left), `Check`, `Cross` (x), `Pause`, `More` (ellipsis). Список со всеми значками — витрина `/design` (dev).
 - `ErrorMessage` (`ErrorMessage.tsx`) — `message`, необязательные `onRetry` и `retryLabel`; `role="alert"`.
 - `Loading` (`Loading.tsx`) — индикатор загрузки, `role="status"`.
 
