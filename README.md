@@ -26,8 +26,9 @@ cp .env.example .env.local   # адрес бэкенда и dev-токен
 pnpm dev                     # http://localhost:5173
 ```
 
-Запросы `/api` и `/health` dev-сервер проксирует в бэкенд. Пока нет входа через cookie,
-доступ к API — по personal access token из `.env.local` (`ATOMIC_DEV_TOKEN`), см. `docs/adr/0003-*`.
+Запросы `/api` dev-сервер проксирует в бэкенд. Вход — кнопкой «Войти» (бэкенд с `WEB__ORIGIN=http://localhost:5173`,
+клиент `atomic-tasks-web` в локальном Rauthy). Без Rauthy — personal access token в `.env.local` (`ATOMIC_DEV_TOKEN`),
+см. `docs/adr/0003-*`.
 
 ## Сборка
 

@@ -2,8 +2,8 @@
 
 ## Overview
 
-Оболочка приложения: провайдеры, роутер и разметка всех экранов. Шапка (название, пользователь,
-индикатор бэкенда) видна всегда, содержимое маршрутов — только вошедшему пользователю. Пока здесь же
+Оболочка приложения: провайдеры, роутер и разметка всех экранов. Шапка (название; вошедшему — имя и «Выйти»)
+видна всегда, содержимое маршрутов — только вошедшему пользователю. Пока здесь же
 главная-заглушка и страница «Не найдено»; экраны предметной области будут в `features/`.
 
 ## Interface
@@ -15,10 +15,11 @@
   `Link` проверяет `tsc`.
 - `createQueryClient`, `shouldRetryQuery`, `MAX_QUERY_RETRIES` (`queryClient.ts`) — настройки кэша: повтор
   только сети и `5xx` (до 2 раз), мутации без повторов, `401` перезапрашивает `me`.
-- `Layout` (`Layout.tsx`) — разметка корневого маршрута: шапка и `<main>` с `SessionGate` из `auth/`.
+- `Layout` (`Layout.tsx`) — разметка корневого маршрута: шапка (с `LogoutButton` из `auth/` при `signedIn`) и
+  `<main>` с `SessionGate` из `auth/`.
 - `AriaRouterBridge` (`AriaRouterBridge.tsx`) — `RouterProvider` React Aria: ссылки и меню React Aria
   переходят через TanStack Router.
-- `HomePage`, `NotFoundPage`, `CrashScreen`, `UserName`, `HealthStatus` — экраны и части шапки, используются
+- `HomePage`, `NotFoundPage`, `CrashScreen`, `UserName` — экраны и части шапки, используются
   только внутри `app/`.
 
 ## Invariants
@@ -33,7 +34,6 @@
 ## Side Effects
 
 - Роутер читает и меняет историю браузера (History API).
-- `HealthStatus` при монтировании делает один запрос `GET /health` без повторов (`retry: false`).
 - `QueryCache`/`MutationCache` при `401` перезапрашивают `GET /api/v1/me`.
 - `CrashScreen` по кнопке «Перезагрузить» перезагружает страницу.
 

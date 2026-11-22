@@ -19,17 +19,18 @@ UI — React Aria Components со своим CSS. Почему так — ADR 00
 - Сборка (`pnpm build`) превращает TypeScript и React в обычные JS/CSS-файлы в `dist/`. В проде их отдаёт
   nginx из образа `ghcr.io/atomic-tasks/web` — своего Node-процесса нет (ADR 0005).
 - Сайт и API на одном хосте: Traefik отдаёт `/api/` бэкенду, остальное — сайту (ADR 0003, спека 0008 бэкенда).
-  `/health` бэкенда на хосте сайта нет: индикатор перейдёт на `GET /api/v1/health`, когда он появится в контракте.
+  `/health` бэкенда на хосте сайта нет: доступность бэкенда сайт видит по ответу `GET /api/v1/me` (спека 0003).
 - nginx отвечает за то, чего Traefik не умеет: `index.html` на любой путь, кэш (`assets/` — на год,
   `index.html` — без кэша), заголовки безопасности (CSP и др.), `503` на `/api/`, если бэкенда нет.
   Поэтому не нужен CORS, а cookie сессии — «своя» для страницы (`SameSite=Lax`).
 - В разработке ту же роль играет прокси dev-сервера Vite (`vite.config.ts`): `pnpm dev` на :5173,
-  запросы `/api` и `/health` уходят в бэкенд на `ATOMIC_API_URL` (по умолчанию `http://localhost:8000`).
+  запросы `/api` уходят в бэкенд на `ATOMIC_API_URL` (по умолчанию `http://localhost:8000`).
 
 ## Вход
 
-Целевое (ADR 0003): бэкенд сам проходит вход в Rauthy и ставит httpOnly-cookie сессии; сайт видит только
-cookie и узнаёт пользователя через `GET /api/v1/me`. Бэкенд: ADR 0013 и спека 0008
+ADR 0003, спека 0003: бэкенд сам проходит вход в Rauthy и ставит httpOnly-cookie сессии; сайт видит только
+cookie и узнаёт пользователя через `GET /api/v1/me`. «Войти» — переход браузера на
+`/api/v1/auth/login?return_to=<путь>`, «Выйти» — `POST /api/v1/auth/logout` и перезагрузка на `/`. Бэкенд: ADR 0013 и спека 0008
 (`../backend/docs/specs/0008-browser-sessions/`).
 
 До этого — локальная разработка с personal access token: `ATOMIC_DEV_TOKEN` в `.env.local`, dev-прокси

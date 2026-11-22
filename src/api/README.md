@@ -35,7 +35,7 @@
 
 ## Side Effects
 
-- Сетевые запросы `fetch` к `/api/v1/*` и `/health` того же хоста.
+- Сетевые запросы `fetch` к `/api/v1/*` того же хоста.
 - Хуки читают и пишут кэш TanStack Query из `QueryClientProvider` (`app/`).
 
 ## Verification
