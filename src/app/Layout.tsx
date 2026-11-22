@@ -1,32 +1,44 @@
 import { Outlet } from "@tanstack/react-router";
 
-import { LogoutButton } from "../auth/LogoutButton";
 import { SessionGate } from "../auth/SessionGate";
 import { useSession } from "../auth/useSession";
-import { Link } from "../shared/ui/Link";
+import { FolderIcon } from "../shared/ui/icons/FolderIcon";
+import { FolderOpenIcon } from "../shared/ui/icons/FolderOpenIcon";
+import { ListChecksIcon } from "../shared/ui/icons/ListChecksIcon";
+import { ListIcon } from "../shared/ui/icons/ListIcon";
+import { TabBar } from "../shared/ui/TabBar";
 import { AriaRouterBridge } from "./AriaRouterBridge";
 import "./Layout.css";
-import { UserName } from "./UserName";
 
-/** Разметка всех экранов (корневой маршрут): шапка и содержимое, доступное только после входа. */
+const TABS = [
+  {
+    to: "/current",
+    label: "Текущие",
+    icon: <ListIcon />,
+    activeIcon: <ListChecksIcon />,
+  },
+  {
+    to: "/explorer",
+    label: "Проводник",
+    icon: <FolderIcon />,
+    activeIcon: <FolderOpenIcon />,
+  },
+] as const;
+
+/**
+ * Оболочка всех экранов: содержимое доступно только после входа; вошедшему внизу — `TabBar`.
+ * Верхнюю панель (`ScreenHeader`) рисует сам экран.
+ */
 export function Layout() {
   const signedIn = useSession().status === "signedIn";
   return (
     <AriaRouterBridge>
-      <header className="Layout-header">
-        <h1 className="Layout-title">
-          <Link to="/">AtomicTasks</Link>
-        </h1>
-        <div className="Layout-meta">
-          <UserName />
-          {signedIn && <LogoutButton />}
-        </div>
-      </header>
       <main className="Layout-main">
         <SessionGate>
           <Outlet />
         </SessionGate>
       </main>
+      {signedIn && <TabBar aria-label="Разделы" items={TABS} />}
     </AriaRouterBridge>
   );
 }

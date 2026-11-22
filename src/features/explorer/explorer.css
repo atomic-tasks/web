@@ -1,0 +1,35 @@
+@layer components {
+  .Explorer-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-inline-size: var(--content-width);
+    margin-inline: auto;
+    padding: var(--space-2) var(--space-4) var(--space-6);
+  }
+
+  .Explorer-empty,
+  .Explorer-note {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .Explorer-empty {
+    padding-block: var(--space-8);
+    text-align: center;
+  }
+}
+
+@layer components {
+  .ItemDialog {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .ItemDialog-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+  }
+}

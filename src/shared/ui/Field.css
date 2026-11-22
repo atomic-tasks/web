@@ -1,0 +1,62 @@
+@layer components {
+  .Field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .Field-label {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-small);
+  }
+
+  .Field-input {
+    min-block-size: var(--target-size);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+  }
+
+  textarea.Field-input {
+    resize: vertical;
+  }
+
+  .Field-input[data-focused],
+  select.Field-input:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .Field-input[data-invalid] {
+    border-color: var(--color-danger);
+  }
+}
+
+@layer components {
+  .Field-value {
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .Field-range {
+    inline-size: 100%;
+    min-block-size: var(--target-size);
+    margin: 0;
+  }
+
+  .Field-range:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .Field-scale {
+    display: flex;
+    justify-content: space-between;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+  }
+}

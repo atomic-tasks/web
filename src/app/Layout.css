@@ -1,34 +1,6 @@
 @layer components {
-  .Layout-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-3) var(--space-4);
-    border-bottom: var(--border-width) solid var(--color-border);
-    background: var(--color-surface);
-  }
-
-  .Layout-title {
-    margin: 0;
-    font-size: var(--font-size-title);
-  }
-
-  .Layout-meta {
-    display: flex;
-    gap: var(--space-4);
-    margin-inline-start: auto;
-    color: var(--color-text-muted);
-    font-size: var(--font-size-small);
-  }
-
-  .Layout-meta > p {
-    margin: 0;
-  }
-
+  /* Снизу — место под плавающую панель, чтобы последняя строка не пряталась под стеклом. */
   .Layout-main {
-    max-width: var(--content-width);
-    margin: 0 auto;
-    padding: var(--space-6) var(--space-4);
+    padding-block-end: calc(var(--dock-height) + var(--space-8) + var(--safe-bottom));
   }
 }

@@ -1,0 +1,33 @@
+@layer components {
+  .IconButton {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    min-inline-size: var(--target-size);
+    min-block-size: var(--target-size);
+    padding: var(--space-1);
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  .IconButton svg {
+    inline-size: var(--space-6);
+    block-size: var(--space-6);
+  }
+
+  .IconButton[data-hovered] {
+    background: var(--color-surface-sunken);
+  }
+
+  .IconButton[data-pressed] {
+    background: var(--color-accent-soft);
+  }
+
+  .IconButton[data-focus-visible] {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+}

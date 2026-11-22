@@ -14,6 +14,7 @@
 - `app/`: [README](./app/README.md) — оболочка: провайдеры, роутер, разметка экранов.
 - `api/`: [README](./api/README.md) — клиент к бэкенду: хуки и функции от Orval, HTTP-слой с cookie и ошибками,
   тексты ошибок для пользователя.
+- `features/`: [README](./features/README.md) — экраны предметной области (`explorer/`: «Текущие» и «Проводник»).
 - `auth/`: [README](./auth/README.md) — сессия и текущий пользователь по `GET /api/v1/me`.
 - `shared/`: [README](./shared/README.md) — общий код без знания о предметной области.
 

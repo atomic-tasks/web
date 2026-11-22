@@ -3,7 +3,16 @@ import { useEffect, useState } from "react";
 import { AnchorButton } from "../shared/ui/AnchorButton";
 import { Button } from "../shared/ui/Button";
 import { ErrorMessage } from "../shared/ui/ErrorMessage";
-import { CurrentIcon } from "../shared/ui/icons/CurrentIcon";
+import { BackIcon } from "../shared/ui/icons/BackIcon";
+import { CheckIcon } from "../shared/ui/icons/CheckIcon";
+import { ChevronRightIcon } from "../shared/ui/icons/ChevronRightIcon";
+import { CrossIcon } from "../shared/ui/icons/CrossIcon";
+import { ListChecksIcon } from "../shared/ui/icons/ListChecksIcon";
+import { ListIcon } from "../shared/ui/icons/ListIcon";
+import { FolderOpenIcon } from "../shared/ui/icons/FolderOpenIcon";
+import { MoreIcon } from "../shared/ui/icons/MoreIcon";
+import { PauseIcon } from "../shared/ui/icons/PauseIcon";
+import { PenIcon } from "../shared/ui/icons/PenIcon";
 import { FolderIcon } from "../shared/ui/icons/FolderIcon";
 import { Link } from "../shared/ui/Link";
 import { Loading } from "../shared/ui/Loading";
@@ -23,6 +32,20 @@ const COLORS = [
   "warning",
   "danger",
   "danger-surface",
+] as const;
+
+const ICONS = [
+  ["ListIcon", <ListIcon />],
+  ["ListChecksIcon", <ListChecksIcon />],
+  ["FolderIcon", <FolderIcon />],
+  ["FolderOpenIcon", <FolderOpenIcon />],
+  ["ChevronRightIcon", <ChevronRightIcon />],
+  ["BackIcon", <BackIcon />],
+  ["CheckIcon", <CheckIcon />],
+  ["PauseIcon", <PauseIcon />],
+  ["CrossIcon", <CrossIcon />],
+  ["MoreIcon", <MoreIcon />],
+  ["PenIcon", <PenIcon />],
 ] as const;
 
 const TEXT_SIZES = ["caption", "small", "body", "title"] as const;
@@ -64,6 +87,18 @@ export function DesignPage() {
             }}
           />
         </label>
+      </section>
+
+      <section aria-labelledby="design-icons">
+        <h3 id="design-icons">Значки</h3>
+        <ul className="DesignPage-icons">
+          {ICONS.map(([name, icon]) => (
+            <li key={name}>
+              {icon}
+              <code>{name}</code>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section aria-labelledby="design-colors">
@@ -116,7 +151,7 @@ export function DesignPage() {
       <TabBar
         aria-label="Основная навигация (витрина)"
         items={[
-          { to: "/", label: "Главная", icon: <CurrentIcon /> },
+          { to: "/", label: "Главная", icon: <ListIcon /> },
           { to: "/design", label: "Витрина", icon: <FolderIcon /> },
         ]}
       />

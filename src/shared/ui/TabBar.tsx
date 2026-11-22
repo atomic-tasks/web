@@ -10,8 +10,10 @@ export interface TabBarItem {
   to: NonNullable<LinkProps["to"]>;
   /** Видимая подпись пункта. */
   label: string;
-  /** Декоративный значок (`aria-hidden`), например `<CurrentIcon />`. */
+  /** Декоративный значок (`aria-hidden`), например `<ListIcon />`. */
   icon: ReactNode;
+  /** Значок для текущего пункта (например, открытая папка); нет — остаётся `icon`. */
+  activeIcon?: ReactNode;
 }
 
 export interface TabBarProps {
@@ -31,7 +33,8 @@ export function TabBar({ items, ...props }: TabBarProps) {
         {items.map((item) => (
           <li key={item.label} className="TabBar-item">
             <Link to={item.to} variant="bare">
-              {item.icon}
+              <span className="TabBar-icon">{item.icon}</span>
+              {item.activeIcon && <span className="TabBar-icon-active">{item.activeIcon}</span>}
               <span>{item.label}</span>
             </Link>
           </li>

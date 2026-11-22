@@ -6,16 +6,16 @@
 
 Маршруты (код, `router.tsx`), все — внутри `Layout` за `SessionGate`:
 
-| Адрес                 | Экран                  | Параметры                                                                                            |
-| --------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| `/`                   | редирект на `/current` | —                                                                                                    |
-| `/current`            | Текущие                | search `status` (необязательный, массив): без него — открытые (`in_progress`, `todo`, как у бэкенда) |
-| `/explorer`           | Проводник, корень      | —                                                                                                    |
-| `/explorer/$folderId` | Проводник, папка       | `folderId` — uuid                                                                                    |
+| Адрес                 | Экран                  | Параметры                                                                                                                                      |
+| --------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                   | редирект на `/current` | —                                                                                                                                              |
+| `/current`            | Текущие                | search `status` (необязательный: `in_progress` или `todo`, на API уходит массивом): без него — открытые (`in_progress`, `todo`, как у бэкенда) |
+| `/explorer`           | Проводник, корень      | —                                                                                                                                              |
+| `/explorer/$folderId` | Проводник, папка       | `folderId` — uuid                                                                                                                              |
 
 `Layout`: сверху `ScreenHeader` экрана, снизу `TabBar` (+ место под кнопку «+», в этой спеке не рисуется),
 `<main>` с отступом снизу под панель (`scroll-padding`, safe-area). Старая шапка с «AtomicTasks», именем
-и «Выйти» убирается: имя и «Выйти» — в меню профиля `ProfileMenu` (React Aria `MenuTrigger`) в `ScreenHeader`.
+и «Выйти» убирается: кнопка с именем и «Выйти» — `ProfileMenu` (React Aria `DialogTrigger` + `Popover`), его подставляет `app/` в слот `actions` экрана.
 
 Хлебные крошки: назад — ссылка на `parent_id` папки (из `path` ответа `browse_folder`), не `history.back()`:
 работает и при заходе по прямой ссылке. Переход анимируется View Transitions (`document.startViewTransition`
@@ -29,15 +29,15 @@
 - `ExplorerPage.tsx` — экран папки (`browseFolder`).
 - `CurrentPage.tsx` — экран «Текущие» (`listNestedTasks` корня).
 - `FolderRow.tsx`, `TaskRow.tsx` — строки (GridList-элементы), используют `ListRow`, `StatusMark`, `Badge`.
-- `TaskStatusMenu.tsx`, `FolderStatusMenu.tsx` — выбор статуса (React Aria `Menu`).
-- `useChangeTaskStatus.ts`, `useChangeFolderStatus.ts` — мутации с оптимистичным обновлением и откатом
-  поверх `useChangeTaskStatus`/`useChangeFolderStatus` Orval.
+- `ItemDialog.tsx` — окно правки (название, описание, вес, статус); `useSaveItem.ts` — `PATCH` полей + `POST` статуса.
+- `useChangeTaskStatus.ts` — мутация статуса задачи (по тапу на значок) с оптимистичным обновлением и откатом;
+  `taskCache.ts` — правка и откат кэша. Статус папки меняется только в `ItemDialog` (`useSaveItem`), без оптимизма.
 - `statusLabels.ts` — подписи статусов по-русски (`Record<TaskStatus, string>`, `Record<FolderStatus, string>`);
   единственное место, где «человеческие» слова для API-значений.
 - `pathLabel.ts` — «Работа › AtomicTasks» из `path`; формат приоритета (`formatPriority`) — тесты (логика форматирования).
 - `README.md`.
 
-`app/`: `router.tsx` (4 маршрута, редирект), `Layout.tsx` (новая оболочка), `ProfileMenu.tsx` (имя + `LogoutButton`
+`app/`: `router.tsx` (4 маршрута, редирект), `Layout.tsx` (новая оболочка), `ProfileMenu.tsx` (кнопка с именем → окно с `LogoutButton`
 из `auth/`), `HomePage.tsx` удаляется. Контракт `app/` обновляется: Interface (маршруты), Side Effects.
 
 `shared/ui/`: только то, что принесла 0004; если понадобится ещё компонент (скелетон, `Menu`) — добавляется
@@ -47,23 +47,24 @@
 
 Делаются в 0005 вместе с экранами, где известны реальные слоты. Токены, `.Glass` и `TabBar` готовы (0004).
 
-| Файл (`src/shared/ui/`)                | Что                                                                                                                               |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `ScreenHeader.tsx`, `.css`             | Верхняя панель: ссылка «назад», заголовок; сворачивание большого заголовка — по необходимости, не Baseline                        |
-| `ListGroup.tsx`, `ListRow.tsx`, `.css` | Вид «сгруппированный список»; слоты определяются по `FolderRow`/`TaskRow`                                                         |
-| `StatusMark.tsx`, `.css`               | Значок статуса: форма и цвет (todo — пустой круг, in_progress — круг с точкой, paused — пауза, done — галочка, cancelled — крест) |
-| `Badge.tsx`, `.css`                    | Пилюля со значением (приоритет)                                                                                                   |
-| `IconButton.tsx`, `.css`               | Кнопка только со значком (меню `⋯`); тип требует `aria-label`                                                                     |
-| `icons/…Icon.tsx`                      | По файлу на значок: `ChevronIcon`, `CheckIcon`, `PauseIcon`, `CrossIcon`, `MoreIcon`, `BackIcon`                                  |
-| `ProgressBar.tsx`, `.css`              | После релиза бэкенда 0010: стилизованный `<progress>` (значение атрибутами, `aria-label`)                                         |
+| Файл (`src/shared/ui/`)                                                                                  | Что                                                                                                                                                                            |
+| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ScreenHeader.tsx`, `.css`                                                                               | Верхняя панель: ссылка «назад», заголовок; сворачивание большого заголовка — по необходимости, не Baseline                                                                     |
+| `ListGroup.tsx`, `ListRow.tsx`, `.css`                                                                   | Вид «сгруппированный список»; слоты определяются по `FolderRow`/`TaskRow`                                                                                                      |
+| `StatusMark.tsx`, `.css`                                                                                 | Значок статуса: форма и цвет (todo — пустой круг, in_progress — круг с точкой, paused — пауза, done — галочка, cancelled — крест)                                              |
+| `Badge.tsx`, `.css`                                                                                      | Пилюля со значением (приоритет)                                                                                                                                                |
+| `IconButton.tsx`, `.css`                                                                                 | Кнопка только со значком (значок статуса, перо у папки); тип требует `aria-label`                                                                                              |
+| `icons/…Icon.tsx`                                                                                        | Значки Lucide (ISC), контуры скопированы, общая обёртка `Icon`: `List`, `ListChecks`, `Folder`, `FolderOpen`, `Pen`, `ChevronRight`, `Back`, `Check`, `Cross`, `Pause`, `More` |
+| `Modal`, `Field` (`TextField`, `SliderField`, `SelectField`), `Switch`, `SegmentedControl`, `ActionMenu` | `.tsx`, `.css`                                                                                                                                                                 | Окно, поля формы, переключатели (в 0004 не было; `ActionMenu` пока нигде не используется) |
+| `ProgressBar.tsx`, `.css`                                                                                | После релиза бэкенда 0010: стилизованный `<progress>` (значение атрибутами, `aria-label`)                                                                                      |
 
 Также в 0005: монтирование `TabBar` в `Layout` (пункты «Текущие» `/current`, «Проводник» `/explorer`) и `padding-block-end` под панель.
 
 ## Данные и состояние
 
 - **Ключи Query** — из Orval (`getBrowseFolderQueryKey(id, params)`, `getListNestedTasksQueryKey(...)`); своих не вводим.
-- **Загрузка.** `loader` маршрута делает `queryClient.ensureQueryData` — данные готовы к показу, скелетон только
-  при первом открытии; навигация назад мгновенная из кэша.
+- **Загрузка.** Данные запрашивают хуки Orval на экране (`staleTime` 30 с), пока их нет — `Loading`; повторное открытие
+  показывает кэш сразу. (`loader` с `ensureQueryData` не делали: хватает кэша Query.)
 - **Свежесть.** `staleTime` 30 с; обновление при возврате на вкладку (по умолчанию Query).
 - **Мутация статуса задачи.** `onMutate`: отменить запросы, сохранить снимок, записать новый статус в кэш
   `browseFolder` и `listNestedTasks`; `onError`: откат снимка + текст `describeApiError`; `onSettled`: инвалидировать
@@ -93,6 +94,6 @@
   подпись «Показаны первые N».
 - **Оптимистичный откат при быстрых нажатиях**: `cancelQueries` в `onMutate` и снимок на каждую мутацию.
 - **GridList + ссылки/кнопки внутри строки**: вложенные интерактивные элементы — типичная ловушка a11y; сверять
-  с примерами React Aria, строка папки — одна ссылка, строка задачи — одно действие + меню.
+  с примерами React Aria, строка папки — действие «открыть» (не `<a href>`: `useHref` React Aria не знает `params` роутера) + кнопка пера, строка задачи — действие «открыть окно» + кнопка значка статуса.
 - **View Transitions + TanStack Router**: поддержка в роутере проверить на нашей версии; запасной путь — без анимации.
 - **Большие папки**: без виртуализации (React Aria `Virtualizer`) — решаем, когда появится папка с сотнями строк.

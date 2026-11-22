@@ -72,6 +72,7 @@
     --dock-height: 4rem;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --z-dock: 20;
+    --opacity-dimmed: 0.6;
 
     /* Стекло и тень (компонентные токены) */
     --glass-bg: color-mix(in srgb, var(--color-surface) 72%, transparent);

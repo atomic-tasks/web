@@ -41,19 +41,29 @@
       color var(--duration-base) var(--ease-standard);
   }
 
+  .TabBar-icon,
+  .TabBar-icon-active {
+    display: flex;
+  }
+
+  .TabBar-icon-active,
+  .TabBar-item > a[aria-current="page"] .TabBar-icon:has(+ .TabBar-icon-active) {
+    display: none;
+  }
+
+  .TabBar-item > a[aria-current="page"] .TabBar-icon-active {
+    display: flex;
+  }
+
   .TabBar-item > a svg {
     block-size: var(--space-6);
     inline-size: var(--space-6);
   }
 
-  /* Текущий пункт отличается не только цветом: жирная подпись и закрашенный значок (WCAG 1.4.1). */
+  /* Текущий пункт отличается не только цветом: жирная подпись и другой значок (WCAG 1.4.1). */
   .TabBar-item > a[aria-current="page"] {
     background: var(--color-accent-soft);
     color: var(--color-accent);
     font-weight: var(--font-weight-bold);
-  }
-
-  .TabBar-item > a[aria-current="page"] svg {
-    fill: currentColor;
   }
 }
