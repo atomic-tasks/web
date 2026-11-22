@@ -30,6 +30,11 @@ export default defineConfig([
           selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
           message: "Сырой HTML — путь к XSS. Тексты задач выводим только как текст.",
         },
+        {
+          selector: "JSXAttribute[name.name='style']",
+          message:
+            "Атрибут style нарушает CSP (ADR 0005): оформление — через классы и токены (ADR 0006).",
+        },
       ],
       "no-restricted-globals": [
         "error",

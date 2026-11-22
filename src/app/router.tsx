@@ -1,6 +1,7 @@
 import { createRootRoute, createRoute, createRouter } from "@tanstack/react-router";
 
 import { CrashScreen } from "./CrashScreen";
+import { DesignRoute } from "./DesignRoute";
 import { HomePage } from "./HomePage";
 import { Layout } from "./Layout";
 import { NotFoundPage } from "./NotFoundPage";
@@ -16,8 +17,15 @@ const homeRoute = createRoute({
   component: HomePage,
 });
 
+// Витрина компонентов: в продовой сборке отдаёт «Не найдено» (см. `DesignRoute`).
+const designRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/design",
+  component: DesignRoute,
+});
+
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([homeRoute]),
+  routeTree: rootRoute.addChildren([homeRoute, designRoute]),
   defaultErrorComponent: CrashScreen,
   defaultNotFoundComponent: NotFoundPage,
 });

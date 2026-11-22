@@ -1,0 +1,29 @@
+/*
+ * Стекло: только для элементов управления поверх содержимого (ADR 0006). Фон — не прозрачнее 72% (tokens.css).
+ * Один сплошной запасной вид для всех случаев, где стекло недоступно или нежелательно.
+ */
+@layer components {
+  .Glass {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: var(--border-width) solid var(--color-glass-edge);
+    box-shadow: var(--shadow-floating);
+  }
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .Glass {
+      background: var(--color-surface);
+      border-color: var(--color-border-strong);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+    .Glass {
+      background: var(--color-surface);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      border-color: var(--color-border-strong);
+    }
+  }
+}
