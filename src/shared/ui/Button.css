@@ -1,54 +1,59 @@
-.Button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
-  cursor: pointer;
-}
+@layer components {
+  .Button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-block-size: var(--target-size);
+    min-inline-size: var(--target-size);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width) solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+    cursor: pointer;
+  }
 
-.Button[data-variant="primary"] {
-  border-color: var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-accent-text);
-}
+  .Button[data-variant="primary"] {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-accent-text);
+  }
 
-.Button[data-hovered] {
-  filter: brightness(0.95);
-}
+  .Button[data-hovered] {
+    filter: brightness(0.95);
+  }
 
-.Button[data-pressed] {
-  filter: brightness(0.9);
-}
+  .Button[data-pressed] {
+    filter: brightness(0.9);
+  }
 
-.Button[data-focus-visible] {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-}
+  .Button[data-focus-visible] {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
 
-.Button[data-disabled] {
-  opacity: 0.5;
-  cursor: default;
-}
+  .Button[data-disabled] {
+    opacity: 0.5;
+    cursor: default;
+  }
 
-/* `AnchorButton` — обычный `<a>`: состояния через псевдоклассы, а не data-атрибуты React Aria. */
-a.Button {
-  text-decoration: none;
-}
+  /* `AnchorButton` — обычный `<a>`: состояния через псевдоклассы, а не data-атрибуты React Aria. */
+  a.Button {
+    text-decoration: none;
+  }
 
-a.Button:hover {
-  filter: brightness(0.95);
-}
+  a.Button:hover {
+    filter: brightness(0.95);
+  }
 
-a.Button:active {
-  filter: brightness(0.9);
-}
+  a.Button:active {
+    filter: brightness(0.9);
+  }
 
-a.Button:focus-visible {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
+  a.Button:focus-visible {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
 }

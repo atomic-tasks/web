@@ -3,8 +3,13 @@ import { Link as AriaLink, type LinkProps as AriaLinkProps } from "react-aria-co
 
 import "./Link.css";
 
-function StyledAriaLink(props: Omit<AriaLinkProps, "className" | "style">) {
-  return <AriaLink {...props} className="Link" />;
+interface StyledLinkProps extends Omit<AriaLinkProps, "className" | "style"> {
+  /** `inline` — ссылка в тексте; `bare` — без вида ссылки (пункты навигации, вид задаёт родитель). */
+  variant?: "inline" | "bare";
+}
+
+function StyledAriaLink({ variant = "inline", ...props }: StyledLinkProps) {
+  return <AriaLink {...props} className="Link" data-variant={variant} />;
 }
 
 const RouterLink = createLink(StyledAriaLink);

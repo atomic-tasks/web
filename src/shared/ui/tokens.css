@@ -1,0 +1,90 @@
+/*
+ * Токены оформления (ADR 0006, спека 0004). Единственное место, где живут литералы значений.
+ * Уровень 1 — значения (шкалы, цвета схем), уровень 2 — семантика (--color-*), светлая/тёмная — через light-dark().
+ * Компонентные токены — только --glass-*. Контраст всех пар посчитан в docs/specs/0004-design-system/plan.md.
+ * `theme-color` в index.html повторяет --color-bg (HTML не умеет читать CSS): меняя --color-bg, поменяй и его.
+ */
+@layer base {
+  :root {
+    color-scheme: light dark;
+
+    /* Оттенок акцента, 5–35 (малиново-красный … красно-оранжевый); диапазон и причины — спека 0004, «Акцент». */
+    --accent-hue: 18;
+
+    /* Цвета */
+    --color-bg: light-dark(#f2f2f7, #0b0b0d);
+    --color-surface: light-dark(#ffffff, #1c1c1e);
+    --color-surface-sunken: light-dark(#e8e8ee, #2c2c2e);
+    --color-text: light-dark(#111114, #f5f5f7);
+    --color-text-muted: light-dark(#5e5e66, #98989f);
+    --color-border: light-dark(rgb(0 0 0 / 0.1), rgb(255 255 255 / 0.12));
+    --color-border-strong: light-dark(#767680, #7a7a82);
+    --color-accent: light-dark(
+      oklch(0.55 0.22 var(--accent-hue)),
+      oklch(0.68 0.2 var(--accent-hue))
+    );
+    --color-accent-text: light-dark(#ffffff, #111114);
+    --color-accent-soft: color-mix(in oklab, var(--color-accent) 14%, transparent);
+    --color-focus: var(--color-accent);
+    --color-success: light-dark(#1a7f37, #4cd16b);
+    --color-warning: light-dark(#9a5b00, #fbbf24);
+    --color-danger: light-dark(#b42318, #ff6b61);
+    --color-danger-surface: light-dark(#fdecea, #3a1d1b);
+    --color-shadow: light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.5));
+    --color-glass-edge: light-dark(rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.12));
+
+    /* Отступы */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    /* Радиусы */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-full: 9999px;
+
+    /* Текст */
+    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-size-caption: 0.75rem;
+    --font-size-small: 0.875rem;
+    --font-size-body: 1rem;
+    --font-size-title: 1.25rem;
+    --font-weight-regular: 400;
+    --font-weight-bold: 700;
+
+    /* Линии и фокус */
+    --border-width: 1px;
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 2px;
+
+    /* Движение */
+    --duration-fast: 120ms;
+    --duration-base: 220ms;
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+    /* Размеры */
+    --target-size: 24px;
+    --content-width: 720px;
+    --dock-height: 4rem;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --z-dock: 20;
+
+    /* Стекло и тень (компонентные токены) */
+    --glass-bg: color-mix(in srgb, var(--color-surface) 72%, transparent);
+    --glass-blur: blur(20px) saturate(180%);
+    --shadow-floating:
+      0 var(--space-3) var(--space-8) var(--color-shadow),
+      inset 0 var(--border-width) 0 var(--color-glass-edge);
+  }
+
+  /* Сенсорный экран, в том числе у ноутбука: цель касания ≥44px (WCAG 2.5.5). */
+  @media (any-pointer: coarse) {
+    :root {
+      --target-size: 44px;
+    }
+  }
+}

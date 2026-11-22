@@ -1,61 +1,39 @@
 /*
- * Токены оформления: цвета, отступы, радиусы. Компоненты берут значения только отсюда.
- * Тема — по настройке системы (prefers-color-scheme), переключателя нет (спека 0001).
+ * Вход оформления: порядок слоёв, сброс и база. Подключается первым CSS-импортом в app/App.tsx,
+ * иначе слои выстроятся иначе (ADR 0006). Значения — в tokens.css. Тема — по настройке системы (спека 0001).
  */
-:root {
-  color-scheme: light dark;
+@layer reset, base, components;
+@import "./tokens.css";
 
-  --color-bg: #ffffff;
-  --color-surface: #f4f5f7;
-  --color-text: #1b1d21;
-  --color-text-muted: #5c6370;
-  --color-border: #d8dbe0;
-  --color-accent: #2f5bd3;
-  --color-accent-text: #ffffff;
-  --color-danger: #b42318;
-  --color-danger-surface: #fdecea;
-  --color-focus: #2f5bd3;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-
-  --radius: 6px;
-  --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-size: 16px;
-  --font-size-small: 14px;
-  --content-width: 960px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #15171a;
-    --color-surface: #1f2226;
-    --color-text: #e8eaed;
-    --color-text-muted: #a0a6b0;
-    --color-border: #34383e;
-    --color-accent: #7c9cf5;
-    --color-accent-text: #0e1116;
-    --color-danger: #f97066;
-    --color-danger-surface: #3a1d1b;
-    --color-focus: #7c9cf5;
+@layer reset {
+  :where(*, *::before, *::after) {
+    box-sizing: border-box;
   }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@layer base {
+  html {
+    accent-color: var(--color-accent);
+    scroll-padding-block-end: calc(var(--dock-height) + var(--space-4) + var(--safe-bottom));
+  }
 
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-family);
-  font-size: var(--font-size);
-  line-height: 1.5;
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: var(--font-size-body);
+    line-height: 1.5;
+  }
+
+  :where(:focus-visible) {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  @media (forced-colors: active) {
+    :where(:focus-visible) {
+      outline-color: Highlight;
+    }
+  }
 }

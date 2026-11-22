@@ -81,6 +81,12 @@ else
   expect_security_headers "$asset"
 fi
 
+# Иконка вкладки — файл, а не index.html (без файла fallback отдал бы index.html с кодом 200)
+fetch /favicon-light.svg
+expect_code /favicon-light.svg 200
+expect_header /favicon-light.svg content-type image/svg+xml
+if grep -q '<svg' "$tmp/b"; then ok "/favicon-light.svg: это SVG"; else fail "/favicon-light.svg: в ответе нет <svg"; fi
+
 # Несуществующий файл бандла — 404, не index.html
 fetch /assets/nope.js
 expect_code /assets/nope.js 404

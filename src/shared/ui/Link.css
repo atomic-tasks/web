@@ -1,12 +1,20 @@
-.Link {
-  color: var(--color-accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  cursor: pointer;
-}
+@layer components {
+  .Link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: var(--space-1);
+    cursor: pointer;
+  }
 
-.Link[data-focus-visible] {
-  outline: 2px solid var(--color-focus);
-  outline-offset: 2px;
-  border-radius: 2px;
+  /* Ссылка без вида ссылки: пункты навигации, где вид задаёт родитель. */
+  .Link[data-variant="bare"] {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .Link[data-focus-visible] {
+    outline: var(--focus-ring-width) solid var(--color-focus);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: var(--radius-sm);
+  }
 }
